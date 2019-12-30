@@ -1,6 +1,6 @@
 package collectiondsl
 
-import scala.collection.{BuildFrom, Factory, View}
+import scala.collection.{BuildFrom, View}
 
 
 final case class Query[Coll[x] <: Seq[x], A, G <: Tuple, T <: Tuple, R <: Tuple, Comb](
@@ -13,15 +13,11 @@ final case class Query[Coll[x] <: Seq[x], A, G <: Tuple, T <: Tuple, R <: Tuple,
   orderCriterias: Option[Ordering[G]],
   orderResults: Option[Ordering[R]]
 )(given aggF: AggFunc[T, R, Comb]) with
-  def compile(
-    given buildFrom1: BuildFrom[Coll[A], A, Coll[A]],
-    Coll: Factory[QueryResult[Seq, A, G, R], Coll[QueryResult[Coll, A, G, R]]],
-    Coll2: Factory[QueryResult[Coll, A, G, R], Coll[QueryResult[Coll, A, G, R]]]
-  ): Coll[QueryResult[Coll, A, G, R]] =
-    type QueryRes = QueryResult[Coll, A, G, R]
+  def compile: Seq[QueryResult[Seq, A, G, R]] =
+    type QueryRes = QueryResult[Vector, A, G, R]
 
-    val builder = buildFrom1.newBuilder(pipeline)
-    val grouped: Coll[QueryRes] = pipeline
+    val builder = Vector.newBuilder[A]
+    val grouped: Seq[QueryRes] = pipeline
       .filter(filterF)
       .groupBy(getG)
       .view
@@ -35,11 +31,9 @@ final case class Query[Coll[x] <: Seq[x], A, G <: Tuple, T <: Tuple, R <: Tuple,
             }
           val asCol = builder.result()
           val aggRes: R = totals.extract.result
-          val maybeSorted: Coll[A] = orderRecords.fold(asCol) { (ord) =>
+          val maybeSorted = orderRecords.fold(asCol) { (ord) =>
             given Ordering[A] = ord
-            val builder = buildFrom1.newBuilder(asCol)
-            builder.addAll(asCol.sorted)
-            builder.result()
+            asCol.sorted
           }
           aggRes -> maybeSorted
       }
@@ -47,18 +41,18 @@ final case class Query[Coll[x] <: Seq[x], A, G <: Tuple, T <: Tuple, R <: Tuple,
         case (g, (aggRes, vs)) => QueryResult(g, aggRes, vs)
       }
       .filter(qr => havingF(qr.totals))
-      .to(Coll)
+      .toSeq
 
-      val orderedByR: Coll[QueryRes] = 
+      val orderedByR: Seq[QueryRes] = 
         orderResults.fold(grouped) { ord =>
           given Ordering[R] = ord
-          grouped.sortBy(_.totals).to(Coll2)
+          grouped.sortBy(_.totals)
         }
 
-      val orderedByG: Coll[QueryRes] = 
+      val orderedByG: Seq[QueryRes] = 
         orderCriterias.fold(orderedByR) { ord =>
           given Ordering[G] = ord
-          orderedByR.sortBy(_.keys).to(Coll2)
+          orderedByR.sortBy(_.keys)
         }
 
       orderedByG

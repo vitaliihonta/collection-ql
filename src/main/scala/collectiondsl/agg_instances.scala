@@ -28,43 +28,36 @@ given taggedAggCount[A, U]: AggFunc[TaggedAgg[A, U, AggFunc.Type.Count], Long :@
       AggFunc.Result(comb.as[U], comb)
   }
 
-type TupledAggFunc[A <: Tuple, Out <: Tuple, Comb] = AggFunc[A, Out, Comb]
-inline given tupleAgg[L <: Tuple] <: TupledAggFunc[?, ?, ?] = inline erasedValue[L] match
-  case _: Unit => new AggFunc[Unit, Unit, Unit] with
-    override def empty = ()
-    override def (c1: Unit) add (v: Unit) = ()
-    override def (c1: Unit) combine (c2: Unit) = ()
-    override def [O >: Unit] (c: Unit) extract: AggFunc.Result[O, Unit] = AggFunc.Result((), ())
+given unitAgg: AggFunc[Unit, Unit, Unit] = new AggFunc[Unit, Unit, Unit] with
+  override def empty = ()
+  override def (c1: Unit) add (v: Unit) = ()
+  override def (c1: Unit) combine (c2: Unit) = ()
+  override def [O >: Unit] (c: Unit) extract: AggFunc.Result[O, Unit] = AggFunc.Result((), ())
+
+
+given consAgg[A, U, AggF <: AggFunc.Type, HOut, HComb, T <: Tuple, TOut <: Tuple, TComb]: 
+  (given headAgg: AggFunc[TaggedAgg[A, U, AggF], HOut, HComb],
+  tailAgg: AggFunc[T, TOut, TComb]) => AggFunc[TaggedAgg[A, U, AggF] *: T, HOut *: TOut, (HComb, TComb)] = 
+  new AggFunc[TaggedAgg[A, U, AggF] *: T, HOut *: TOut, (HComb, TComb)] with
+
+    override def empty: (HComb, TComb) = 
+      (headAgg.empty, tailAgg.empty)
+
+    override def (c1: (HComb, TComb)) add (value: TaggedAgg[A, U, AggF] *: T) =
+      val (h1, t1) = c1
+      val h2 = value.head
+      val t2 = value.tail
+      (h1.add(h2), t1.add(t2))
+
+    override def (comb1: (HComb, TComb)) combine (comb2: (HComb, TComb)): (HComb, TComb) = 
+      val (h1, t1) = comb1
+      val (h2, t2) = comb2
+      
+      (h1.combine(h2), t1.combine(t2))
+      
+    override def [O >: HOut *: TOut] (comb: (HComb, TComb)) extract: AggFunc.Result[O, (HComb, TComb)] = 
+      val (head, tail) = comb
+      val headRes = head.extract
+      val tailRes = tail.extract
+      AggFunc.Result(headRes.result *: tailRes.result , comb)  
   
-  case sample: (TaggedAgg[a, u, aggF] *: t) => 
-    summonFrom {
-      case given headAgg: AggFunc[TaggedAgg[`a`, `u`, `aggF`], hOut, hComb] =>
-        inline tupleAgg[t] match
-          case tailAgg: TupledAggFunc[`t`, tOut, tComb] =>
-            given AggFunc[t, tOut, tComb] = tailAgg
-            new AggFunc[TaggedAgg[a, u, aggF] *: t, hOut *: tOut, hComb *: tComb *: Unit] with
-
-              override def empty: hComb *: tComb *: Unit = 
-                headAgg.empty *: tailAgg.empty *: ()
-
-              override def (c1: hComb *: tComb *: Unit) add (v: TaggedAgg[a, u, aggF] *: t) =
-                val (h1, t1) = c1
-                val (h2 *: t2) = v
-                h1.add(h2) *: t1.add(t2) *: ()
-
-              override def (comb1: hComb *: tComb *: Unit) combine (comb2: hComb *: tComb *: Unit): hComb *: tComb *: Unit = 
-                val (h1, t1) = comb1
-                val (h2, t2) = comb2
-                
-                (h1.combine(h2), t1.combine(t2))
-                
-              override def [O >: hOut *: tOut] (comb: hComb *: tComb *: Unit) extract: AggFunc.Result[O, hComb *: tComb *: Unit] = 
-                val (head, tail) = comb
-                val headRes = head.extract
-                val tailRes = tail.extract
-                AggFunc.Result(headRes.result *: tailRes.result , comb)
-
-      case _ => error(code"No instance of AggFunc given for TaggedAgg $sample")
-    }
-    
-    

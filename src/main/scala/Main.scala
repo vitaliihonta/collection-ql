@@ -1,5 +1,5 @@
 import scala.language.implicitConversions
-import collectiondsl.{startQl, tupleAgg, _}
+import collectiondsl.{startQl, consAgg, unitAgg, _}
 import collectiondsl.{ given AggFunc[?, ?, ?] }
 import cats.implicits.{ given cats.Monoid[?] }
 
@@ -12,15 +12,14 @@ import cats.implicits.{ given cats.Monoid[?] }
       expr[Long](_ % 3 == 0) as "divisible by 3",
       expr[Long](_ % 4) as "reminder of 4"
     )
-    // .aggregate(
-    //   col[Long] agg count as "count",
-    //   expr[Long](num => num * num * num * num) agg sum as "^4",
-    //   expr[Long](_.toString) agg sum as "some name"
-    // )
+    .aggregate(
+      col[Long] agg count as "count",
+      expr[Long](num => num * num * num * num) agg sum as "^4",
+      expr[Long](_.toString) agg sum as "some name"
+    )
+    .having(_.get["some name"].contains('1'))
+    .compile
 
-  type T = TaggedAgg[Int, "count", AggFunc.Type.Sum] *: Unit
-  // summon[AggFunc[TaggedAgg[Int, "count", AggFunc.Type.Count]]]
-  val foo = tupleAgg[T]
-  
-  // foo
-
+  println(
+    result.mkString("\n")
+  )

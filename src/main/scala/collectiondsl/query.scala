@@ -164,11 +164,7 @@ object QueryBuilder with
           Some(OrdR)
         )
 
-      def compile(
-        given buildFrom1: BuildFrom[Coll[A], A, Coll[A]],
-        Coll: Factory[QueryResult[Seq, A, G, R], Coll[QueryResult[Coll, A, G, R]]],
-        Coll2: Factory[QueryResult[Coll, A, G, R], Coll[QueryResult[Coll, A, G, R]]]
-      ) = Query[Coll, A, G, T, R, Comb](
+      def compile = Query[Coll, A, G, T, R, Comb](
           pipeline,
           getG,
           getT,
@@ -193,11 +189,7 @@ object QueryBuilder with
     )(given aggF: AggFunc[T, R, Comb])
         extends Aggregate[Coll, A, G, T, R, Comb](pipeline, getG, getT, filterOpt) with
 
-    override def compile(
-      given buildFrom1: BuildFrom[Coll[A], A, Coll[A]],
-      Coll: Factory[QueryResult[Seq, A, G, R], Coll[QueryResult[Coll, A, G, R]]],
-      Coll2: Factory[QueryResult[Coll, A, G, R], Coll[QueryResult[Coll, A, G, R]]]
-    ) = Query[Coll, A, G, T, R, Comb](
+    override def compile = Query[Coll, A, G, T, R, Comb](
       pipeline,
       getG,
       getT,

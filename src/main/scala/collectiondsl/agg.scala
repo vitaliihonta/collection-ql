@@ -56,4 +56,4 @@ val rms: AggFunc.Type.RMS             = new AggFunc.Type.RMS       {}
     
 case class TaggedAgg[A, U, AggT <: AggFunc.Type](tagged: A :@ U)
 
-case class QueryResult[Coll[+x] <: Seq[x], +A, K, +T](keys: K, totals: T, values: Coll[A])
+case class QueryResult[+Coll[+x] <: Seq[x], +A, K, +T](keys: K, totals: T, values: Coll[A])
