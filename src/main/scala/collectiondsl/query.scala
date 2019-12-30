@@ -1,6 +1,6 @@
 package collectiondsl
 
-import scala.collection.{BuildFrom, Factory}
+import scala.collection.IterableFactory
 
 sealed trait QueryBuilder[Coll[x] <: Seq[x], A] with
   def pipeline: Coll[A]
@@ -164,7 +164,9 @@ object QueryBuilder with
           Some(OrdR)
         )
 
-      def compile = Query[Coll, A, G, T, R, Comb](
+      def compile(
+        Coll: IterableFactory[Coll]
+      ) = Query[A, G, T, R, Comb](
           pipeline,
           getG,
           getT,
@@ -173,7 +175,7 @@ object QueryBuilder with
           None,
           None,
           None
-      ).compile
+      ).compile(Coll)
     
   end Aggregate
 
@@ -189,7 +191,9 @@ object QueryBuilder with
     )(given aggF: AggFunc[T, R, Comb])
         extends Aggregate[Coll, A, G, T, R, Comb](pipeline, getG, getT, filterOpt) with
 
-    override def compile = Query[Coll, A, G, T, R, Comb](
+    override def compile(
+      Coll: IterableFactory[Coll]
+    ) = Query[A, G, T, R, Comb](
       pipeline,
       getG,
       getT,
@@ -198,7 +202,7 @@ object QueryBuilder with
       orderRecords,
       orderGroups,
       orderResults
-    ).compile
+    ).compile(Coll)
 
   end MaybeOrderedHaving
 end QueryBuilder

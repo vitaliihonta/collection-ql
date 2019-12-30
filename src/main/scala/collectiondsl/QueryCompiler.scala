@@ -1,10 +1,11 @@
 package collectiondsl
 
-import scala.collection.{BuildFrom, View}
+import scala.language.implicitConversions
+import scala.collection.IterableFactory
 
 
-final case class Query[Coll[x] <: Seq[x], A, G <: Tuple, T <: Tuple, R <: Tuple, Comb](
-  pipeline: Coll[A],
+final case class Query[A, G <: Tuple, T <: Tuple, R <: Tuple, Comb](
+  pipeline: Seq[A],
   getG: A => G,
   getT: A => T,
   filterF: A => Boolean,
@@ -13,7 +14,7 @@ final case class Query[Coll[x] <: Seq[x], A, G <: Tuple, T <: Tuple, R <: Tuple,
   orderCriterias: Option[Ordering[G]],
   orderResults: Option[Ordering[R]]
 )(given aggF: AggFunc[T, R, Comb]) with
-  def compile: Seq[QueryResult[Seq, A, G, R]] =
+  def compile[Coll[x] <: Seq[x]](Coll: IterableFactory[Coll]): Coll[QueryResult[Coll, A, G, R]] =
     type QueryRes = QueryResult[Vector, A, G, R]
 
     val builder = Vector.newBuilder[A]
@@ -55,7 +56,15 @@ final case class Query[Coll[x] <: Seq[x], A, G <: Tuple, T <: Tuple, R <: Tuple,
           orderedByR.sortBy(_.keys)
         }
 
-      orderedByG
-
+      val mapped = orderedByG
+        .map(res => 
+          QueryResult[Coll, A, G, R](
+            keys = res.keys,
+            totals = res.totals,
+            values = Coll.newBuilder.addAll(res.values).result()
+          )  
+        )
+      
+      Coll.newBuilder.addAll(mapped).result()
   end compile
 end Query
