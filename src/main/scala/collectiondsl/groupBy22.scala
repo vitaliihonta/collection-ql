@@ -9,17 +9,16 @@ trait groupBy22[Coll[x] <: Seq[x], A] with
     * Like Group By clause in SQL
     *
     **/
-  def groupBy[T, H <: :@[_, _]](f: A => H): GroupBy[Coll, A, H *: Unit] =
+  def groupBy[H <: :@[_, _]](f: A => H): GroupBy[Coll, A, H *: Unit] =
     new GroupBy[Coll, A, H *: Unit](pipeline, a => f(a) *: (), None)
 
-  def groupBy[T, H1 <: :@[_, _], H2 <: :@[_, _]](
+  def groupBy[H1 <: :@[_, _], H2 <: :@[_, _]](
       f1: A => H1,
       f2: A => H2
   ): GroupBy[Coll, A, H1 *: H2 *: Unit] =
     new GroupBy[Coll, A, H1 *: H2 *: Unit](pipeline, a => f1(a) *: f2(a) *: (), None)
 
   def groupBy[
-      T,
       H1 <: :@[_, _],
       H2 <: :@[_, _],
       H3 <: :@[_, _]
@@ -51,7 +50,6 @@ trait groupBy22[Coll[x] <: Seq[x], A] with
       None)
 
   def groupBy[
-      T,
       H1 <: :@[_, _],
       H2 <: :@[_, _],
       H3 <: :@[_, _],
@@ -88,7 +86,6 @@ trait groupBy22[Coll[x] <: Seq[x], A] with
       None)
 
   def groupBy[
-      T,
       H1 <: :@[_, _],
       H2 <: :@[_, _],
       H3 <: :@[_, _],
@@ -130,7 +127,6 @@ trait groupBy22[Coll[x] <: Seq[x], A] with
       None)
 
   def groupBy[
-      T,
       H1 <: :@[_, _],
       H2 <: :@[_, _],
       H3 <: :@[_, _],
@@ -177,7 +173,6 @@ trait groupBy22[Coll[x] <: Seq[x], A] with
       None)
 
   def groupBy[
-      T,
       H1 <: :@[_, _],
       H2 <: :@[_, _],
       H3 <: :@[_, _],
@@ -229,7 +224,6 @@ trait groupBy22[Coll[x] <: Seq[x], A] with
       None)
 
   def groupBy[
-      T,
       H1 <: :@[_, _],
       H2 <: :@[_, _],
       H3 <: :@[_, _],
@@ -286,7 +280,6 @@ trait groupBy22[Coll[x] <: Seq[x], A] with
       None)
 
   def groupBy[
-      T,
       H1 <: :@[_, _],
       H2 <: :@[_, _],
       H3 <: :@[_, _],
@@ -348,7 +341,6 @@ trait groupBy22[Coll[x] <: Seq[x], A] with
       None)
 
   def groupBy[
-      T,
       H1 <: :@[_, _],
       H2 <: :@[_, _],
       H3 <: :@[_, _],
@@ -417,7 +409,6 @@ trait groupBy22[Coll[x] <: Seq[x], A] with
     )
 
   def groupBy[
-      T,
       H1 <: :@[_, _],
       H2 <: :@[_, _],
       H3 <: :@[_, _],
@@ -491,7 +482,6 @@ trait groupBy22[Coll[x] <: Seq[x], A] with
     )
 
   def groupBy[
-      T,
       H1 <: :@[_, _],
       H2 <: :@[_, _],
       H3 <: :@[_, _],
@@ -570,7 +560,6 @@ trait groupBy22[Coll[x] <: Seq[x], A] with
     )
 
   def groupBy[
-      T,
       H1 <: :@[_, _],
       H2 <: :@[_, _],
       H3 <: :@[_, _],
@@ -654,7 +643,6 @@ trait groupBy22[Coll[x] <: Seq[x], A] with
     )
 
   def groupBy[
-      T,
       H1 <: :@[_, _],
       H2 <: :@[_, _],
       H3 <: :@[_, _],
@@ -743,7 +731,6 @@ trait groupBy22[Coll[x] <: Seq[x], A] with
     )
 
   def groupBy[
-      T,
       H1 <: :@[_, _],
       H2 <: :@[_, _],
       H3 <: :@[_, _],
@@ -837,7 +824,6 @@ trait groupBy22[Coll[x] <: Seq[x], A] with
     )
 
   def groupBy[
-      T,
       H1 <: :@[_, _],
       H2 <: :@[_, _],
       H3 <: :@[_, _],
@@ -936,7 +922,6 @@ trait groupBy22[Coll[x] <: Seq[x], A] with
     )
 
   def groupBy[
-      T,
       H1 <: :@[_, _],
       H2 <: :@[_, _],
       H3 <: :@[_, _],
@@ -1040,7 +1025,6 @@ trait groupBy22[Coll[x] <: Seq[x], A] with
     )
 
   def groupBy[
-      T,
       H1 <: :@[_, _],
       H2 <: :@[_, _],
       H3 <: :@[_, _],
@@ -1149,7 +1133,6 @@ trait groupBy22[Coll[x] <: Seq[x], A] with
     )
 
   def groupBy[
-      T,
       H1 <: :@[_, _],
       H2 <: :@[_, _],
       H3 <: :@[_, _],
@@ -1263,7 +1246,6 @@ trait groupBy22[Coll[x] <: Seq[x], A] with
     )
 
   def groupBy[
-      T,
       H1 <: :@[_, _],
       H2 <: :@[_, _],
       H3 <: :@[_, _],
@@ -1382,7 +1364,6 @@ trait groupBy22[Coll[x] <: Seq[x], A] with
     )
 
   def groupBy[
-      T,
       H1 <: :@[_, _],
       H2 <: :@[_, _],
       H3 <: :@[_, _],
@@ -1506,7 +1487,6 @@ trait groupBy22[Coll[x] <: Seq[x], A] with
     )
 
   def groupBy[
-      T,
       H1 <: :@[_, _],
       H2 <: :@[_, _],
       H3 <: :@[_, _],

@@ -15,6 +15,7 @@ object :@ with
 
 implicit class aliasing[A](val self: A) extends AnyVal with
   def as[U]: A :@ U = :@(self)
+  def as(s: Singleton): A :@ s.type = as[s.type]
 
 implicit class namedTupleOps[L <: Tuple](val self: L) extends AnyVal with
   inline def get[U] <: Any = inline erasedValue[L] match

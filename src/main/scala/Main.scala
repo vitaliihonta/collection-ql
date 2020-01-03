@@ -1,11 +1,10 @@
 import scala.language.implicitConversions
-import collectiondsl.{startQl, consAgg, unitAgg, _}
-import collectiondsl.{ given AggFunc[?, ?, ?] }
+import collectiondsl.{startQl, consAgg, converter, unitAgg, _}
+import collectiondsl.{ given AggFunc[?, ?, ?], given QueryToCaseClass[?, ?, ?, ?, ?] }
 import cats.implicits.{ given cats.Monoid[?] }
-import scala.collection.immutable.ArraySeq
 
 @main def foo =
-  val numbers = 1L to 20L
+  val numbers = (1L to 20L).to(List)
   val result = numbers
     .where(_ > 5)
     .groupBy(
@@ -19,8 +18,21 @@ import scala.collection.immutable.ArraySeq
       expr[Long](_.toString) agg sum as "some name"
     )
     .having(_.get["some name"].contains('1'))
-    .compile(List)
-
+    .to(List)
+     
+    
+  val report = result.as[NumbersReport]
+  // val report2 = result.as[Foo0] // doesn't compile
   println(
-    result.mkString("\n")
+    report.mkString("\n")
   )
+
+case class Foo0(x: Int)
+case class NumbersReport(
+  divisibleBy2: Boolean,
+  divisibleBy3: Boolean,
+  reminderOf4: Long,
+  count: Long,
+  power4: Long,
+  someName: String,
+  values: List[Long])

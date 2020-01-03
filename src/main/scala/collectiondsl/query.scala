@@ -164,7 +164,7 @@ object QueryBuilder with
           Some(OrdR)
         )
 
-      def compile(
+      def to(
         Coll: IterableFactory[Coll]
       ) = Query[A, G, T, R, Comb](
           pipeline,
@@ -191,7 +191,7 @@ object QueryBuilder with
     )(given aggF: AggFunc[T, R, Comb])
         extends Aggregate[Coll, A, G, T, R, Comb](pipeline, getG, getT, filterOpt) with
 
-    override def compile(
+    override def to(
       Coll: IterableFactory[Coll]
     ) = Query[A, G, T, R, Comb](
       pipeline,
